@@ -4,15 +4,17 @@
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Download, Volume2, VolumeX, Wand2 } from 'lucide-react';
+import { Download, Volume2, VolumeX, Wand2, Loader2 } from 'lucide-react';
 import { CatParams, drawCat, generateRandomCatParams } from './utils/CatGenerator';
 import { playRandomMeow } from './utils/AudioSynth';
 import { motion } from 'motion/react';
+import { GIFEncoder, quantize, applyPalette } from 'gifenc';
 
 export default function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [muted, setMuted] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [catParams, setCatParams] = useState<CatParams | null>(null);
 
   const generate = useCallback(() => {
@@ -46,12 +48,53 @@ export default function App() {
     return () => cancelAnimationFrame(animationFrameId);
   }, [catParams]);
 
-  const download = () => {
-    if (!canvasRef.current) return;
-    const link = document.createElement('a');
-    link.download = 'pixel-cat.png';
-    link.href = canvasRef.current.toDataURL('image/png');
-    link.click();
+  const downloadGif = async () => {
+    if (!catParams) return;
+    setIsDownloading(true);
+
+    try {
+      // Yield to the event loop so the UI updates to show the loading spinner
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      const gif = GIFEncoder();
+      const canvas = document.createElement('canvas');
+      canvas.width = 320;
+      canvas.height = 320;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      if (!ctx) throw new Error('Could not get 2d context');
+
+      const fps = 15;
+      const durationMs = 4000; // 4 seconds to capture a full blink and breathing cycle
+      const totalFrames = (durationMs / 1000) * fps;
+      const delay = 1000 / fps;
+
+      for (let i = 0; i < totalFrames; i++) {
+        const time = i * delay;
+        ctx.clearRect(0, 0, 320, 320);
+        drawCat(ctx, 320, catParams, time);
+
+        const { data, width, height } = ctx.getImageData(0, 0, 320, 320);
+        const palette = quantize(data, 256, { format: 'rgba4444' });
+        const index = applyPalette(data, palette);
+        gif.writeFrame(index, width, height, { palette, delay });
+      }
+
+      gif.finish();
+      const buffer = gif.bytes();
+      const blob = new Blob([buffer], { type: 'image/gif' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.download = 'pixel-cat.gif';
+      link.href = url;
+      link.click();
+      
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Failed to generate GIF:', err);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -66,27 +109,41 @@ export default function App() {
           <p className="text-neutral-500 text-sm">Generate your own unique pixel art cat!</p>
         </div>
 
-        <div className="relative group">
+        <div className="relative group flex flex-col items-center">
           <motion.div
-            animate={{ scale: isGenerating ? 0.95 : 1 }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(e, info) => {
+              if (Math.abs(info.offset.x) > 50) {
+                generate();
+              }
+            }}
+            animate={{ scale: isGenerating ? 0.9 : 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="touch-none cursor-grab active:cursor-grabbing"
           >
             <canvas
               ref={canvasRef}
               width={320}
               height={320}
-              className="bg-neutral-100 rounded-2xl shadow-inner w-64 h-64 md:w-80 md:h-80"
+              className="bg-neutral-100 rounded-2xl shadow-inner w-64 h-64 md:w-80 md:h-80 pointer-events-none"
               style={{ imageRendering: 'pixelated' }}
             />
           </motion.div>
           
           <button 
-            onClick={download}
-            className="absolute top-4 right-4 bg-white/80 hover:bg-white backdrop-blur-sm p-2 rounded-xl shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-neutral-700 hover:text-indigo-600"
-            title="Download Cat"
+            onClick={downloadGif}
+            disabled={isDownloading}
+            className="absolute top-4 right-4 bg-white/80 hover:bg-white backdrop-blur-sm p-3 md:p-2 rounded-xl shadow-sm opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-neutral-700 hover:text-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed z-10"
+            title="Download GIF"
           >
-            <Download size={20} />
+            {isDownloading ? <Loader2 size={20} className="animate-spin" /> : <Download size={20} />}
           </button>
+
+          <p className="text-neutral-400 text-xs mt-4 md:hidden font-medium tracking-wide">
+            ← Swipe to generate →
+          </p>
         </div>
 
         <div className="flex gap-3 w-full">
