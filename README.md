@@ -1,20 +1,64 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 🐱 Pixel Cat Generator
 
-# Run and deploy your AI Studio app
+A fun, interactive web application that procedurally generates unique, animated pixel art cats with matching synthesized meow sounds. Built entirely with web standard APIs (Canvas & Web Audio) without any external image or audio assets.
 
-This contains everything you need to run your app locally.
+## ✨ Features
 
-View your app in AI Studio: https://ai.studio/apps/5d566ccf-4907-4d4a-a96c-f2fd39a6405c
+### 🎨 Procedural Pixel Art (Canvas API)
+Every time you click "Generate", a brand new cat is drawn pixel-by-pixel on an HTML5 Canvas.
+* **9 Unique Patterns/Breeds**: Solid, Tuxedo, Tabby, Calico, Siamese, Tortoiseshell, Bengal, Sphynx, and Bicolor.
+* **Physical Traits**: Random variations in body type (chunky or slim), ear shapes (pointy, round, folded), and tail shapes (long, short, pointing up).
+* **Colors**: Random base colors, accent colors, eye colors, and pastel background colors.
 
-## Run Locally
+### 🎵 Synthesized Audio (Web Audio API)
+Each cat gets its own unique voice, synthesized in real-time using oscillators and filters.
+* **5 Voice Types**: 
+  * *Classic*: Standard meow.
+  * *Kitten*: High-pitched and short.
+  * *Trill*: A happy, rolling purr-meow with LFO modulation.
+  * *Yowl*: A long, dramatic, low-pitched vocalization.
+  * *Chirp*: A short, bird-like sound cats make when watching prey.
 
-**Prerequisites:**  Node.js
+### 🎬 Real-time Animations
+The cats aren't just static images; they come to life using a `requestAnimationFrame` loop.
+* **Breathing**: Smooth, subtle up-and-down body movement.
+* **Blinking**: Occasional, natural-looking eye blinks.
+* **Tail Wagging**: Physics-inspired pendulum motion for long and upright tails.
 
+### 🛠️ Interactivity
+* **Download**: Save your favorite generated cats as `.png` files to your device.
+* **Mute Toggle**: Easily turn the meow sounds on or off.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 💻 Tech Stack
+
+* **Frontend Framework**: React 19 + TypeScript
+* **Styling**: Tailwind CSS v4
+* **Animations (UI)**: Framer Motion (`motion/react`)
+* **Icons**: Lucide React
+* **Graphics**: HTML5 `<canvas>` API
+* **Audio**: Web Audio API (`AudioContext`)
+* **Build Tool**: Vite
+
+## 📂 Project Structure
+
+* `src/App.tsx`: The main React component containing the UI, animation loop, and state management.
+* `src/utils/CatGenerator.ts`: The core rendering engine. Contains the logic for generating random cat parameters and drawing the pixel grid onto the canvas.
+* `src/utils/AudioSynth.ts`: The audio engine. Uses the Web Audio API to synthesize various types of cat meows procedurally.
+
+## 🚀 Getting Started
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+
+3. Open your browser and navigate to the local URL provided by Vite (usually `http://localhost:3000` or `http://localhost:5173`).
+
+## 📜 License
+
+SPDX-License-Identifier: Apache-2.0
