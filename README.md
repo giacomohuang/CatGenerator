@@ -2,6 +2,26 @@
 
 A fun, interactive web application that procedurally generates unique, animated pixel art cats with matching synthesized meow sounds. Built entirely with web standard APIs (Canvas & Web Audio) without any external image or audio assets.
 
+## 📸 Screenshots
+
+<div align="center">
+  <img src="https://placehold.co/800x500/171717/white?text=Main+Application+UI" alt="Main UI" width="100%" />
+</div>
+
+<br/>
+
+<div align="center">
+  <img src="https://placehold.co/400x400/fbcfe8/1f2937?text=Calico+Cat" alt="Generated Calico Cat" width="48%" />
+  <img src="https://placehold.co/400x400/bfdbfe/1f2937?text=Sphynx+Cat" alt="Generated Sphynx Cat" width="48%" />
+</div>
+
+<div align="center">
+  <img src="https://placehold.co/400x400/bbf7d0/1f2937?text=Bengal+Cat" alt="Generated Bengal Cat" width="48%" />
+  <img src="https://placehold.co/400x400/fef08a/1f2937?text=Tuxedo+Cat" alt="Generated Tuxedo Cat" width="48%" />
+</div>
+
+*(Note: These are placeholder images. To add your own screenshots, take a screenshot of the running app, save them to your project folder, and update the image paths in this README.)*
+
 ## ✨ Features
 
 ### 🎨 Procedural Pixel Art (Canvas API)
